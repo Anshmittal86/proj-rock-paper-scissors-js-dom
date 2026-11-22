@@ -4,7 +4,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const systemModeButton = document.getElementById("system-mode");
 
   const setTheme = (theme) => {
-    document.documentElement.className = theme;
+    if (theme === "system") {
+      applySystemPreference();
+    } else {
+      document.documentElement.className = theme;
+    }
     localStorage.setItem("theme", theme);
   };
 
@@ -14,27 +18,23 @@ document.addEventListener("DOMContentLoaded", () => {
       setTheme(savedTheme);
     } else {
       setTheme("system");
-      applySystemPreference();
     }
   };
 
   const applySystemPreference = () => {
     const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
-    if (prefersDarkScheme.matches) {
-      document.documentElement.className = "dark";
-    } else {
-      document.documentElement.className = "";
-    }
+    document.documentElement.className = prefersDarkScheme.matches ? "dark" : "";
   };
 
   lightModeButton.addEventListener("click", () => setTheme(""));
   darkModeButton.addEventListener("click", () => setTheme("dark"));
-  systemModeButton.addEventListener("click", () => {
-    setTheme("system");
-    applySystemPreference();
-  });
+  systemModeButton.addEventListener("click", () => setTheme("system"));
 
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applySystemPreference);
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+    if (localStorage.getItem("theme") === "system") {
+      applySystemPreference();
+    }
+  });
 
   loadTheme();
 });
